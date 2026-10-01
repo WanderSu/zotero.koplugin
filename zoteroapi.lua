@@ -25,6 +25,14 @@ local SUPPORTED_MEDIA_TYPES = {
     [2] = "application/epub+zip"
 }
 
+-- These link modes are both managed by Zotero and available through the
+-- storage Web API/WebDAV backend. `imported_url` differs only in how the
+-- attachment entered a Zotero library; it is stored like `imported_file`.
+local DOWNLOADABLE_LINK_MODES = {
+    imported_file = true,
+    imported_url = true,
+}
+
 local function joinTables(target, source)
     return table.move(source, 1, #source, #target + 1, target)
 end
@@ -426,6 +434,10 @@ function API.getDirAndPath(attachmentKey)
     return targetDir, targetPath
 end
 
+function API.isDownloadableLinkMode(link_mode)
+    return DOWNLOADABLE_LINK_MODES[link_mode] == true
+end
+
 -- Downloads an attachment file to the correct directory and returns the path.
 -- If the local version is up to date, no network request is made.
 -- Before the download, the download_callback is called.
@@ -448,7 +460,7 @@ function API.downloadAndGetPath(key, download_callback)
         return nil, "Error: this item is a linked attachment. Linked attachments are currently unsupported."
     end
 
-    if item.data.linkMode ~= "imported_file" then
+    if not API.isDownloadableLinkMode(item.data.linkMode) then
         return nil, "Error: unsupported link mode '" .. tostring(item.data.linkMode) .. "'."
     end
 

@@ -104,6 +104,7 @@ function ZoteroBrowser:onMenuSelect(item)
         }
         UIManager:scheduleIn(0.05, function()
             local full_path, e = ZoteroAPI.downloadAndGetPath(item.key)
+            UIManager:close(self.download_dialog)
             if e ~= nil then
                 local b = InfoMessage:new{
                     text = _("Could not open file.") .. e,
@@ -112,7 +113,6 @@ function ZoteroBrowser:onMenuSelect(item)
                 }
                 UIManager:show(b)
             else
-                UIManager:close(self.download_dialog)
                 local ReaderUI = require("apps/reader/readerui")
                 self.close_callback()
                 ReaderUI:showReader(full_path)
@@ -181,13 +181,22 @@ function Plugin:init()
     self.initialized = false
     self:onDispatcherRegisterActions()
     self.ui.menu:registerToMainMenu(self)
-    xpcall(self.initAPIAndBrowser, self.initError, self)
-    self.initialized = true
-    print("Z: successfully initialized!")
+    local initialized, err = xpcall(function()
+        self:initAPIAndBrowser()
+    end, function(e)
+        return self:initError(e)
+    end)
+    self.initialized = initialized
+    if initialized then
+        print("Z: successfully initialized!")
+    else
+        print("Z: Zotero initialization failed: " .. tostring(err))
+    end
 end
 
 function Plugin:initError(e)
-    print("Could not initialize Zotero: " .. e)
+    print("Could not initialize Zotero: " .. tostring(e))
+    return e
 end
 
 function Plugin:checkInitialized()

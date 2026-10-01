@@ -10,7 +10,7 @@ This addon for [KOReader](https://github.com/koreader/koreader) allows you to vi
 ## Features
 * Synchronize via Web API
 * Display collections, navigate to sub-collections
-* Download & open attached PDF files
+* Download & open attached PDF and EPUB files, including Zotero `imported_url` attachments
 * Supports WebDAV storage backend
 * Search entries by the title of the publication, name of the first author or DOI.
 
@@ -23,6 +23,20 @@ This addon for [KOReader](https://github.com/koreader/koreader) allows you to vi
 3. Set your credentials for Zotero either directly in KOReader or edit the configuration file as described [below](#manual-configuration).
 
 In KOReader, the Zotero plugin will be visible in the search tab (magnifying glass icon) inside the top menu.
+
+### Kindle Paperwhite 6
+
+The plugin has no device-specific rendering code and runs on the current KOReader
+Kindle target. KOReader identifies the Paperwhite 6 as a 300 DPI touch device, so
+use a current KOReader Kindle build and install this directory as
+`koreader/plugins/zotero.koplugin`. The **Items per page** setting is useful for
+adjusting the list density to your reading preference.
+
+### Developer checks
+
+Run the self-contained compatibility check with `lua tests/link_mode_test.lua`.
+It validates the attachment link-mode policy without requiring a Zotero account
+or a KOReader installation.
 
 ### Differences to previous  versions
 In previous versions, you had to copy your entire Zotero directory to your device.
